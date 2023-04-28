@@ -1,0 +1,35 @@
+#How to Remove Duplicates when the key ID's
+
+CALCULATE(SUMX(DISTINCT('Table_1'[ID_PROPOSAL]), FIRSTNONBLANK('Table_1'[TOTAL_VALUE], 0)),
+FILTER('Table_1', 'Table_1'[STATUS] = "Won proposal"),
+FILTER('Table_1', 'Table_1'[CLOSING_DATE].[Year] >= 2023),
+FILTER('Table_1', 'Table_1'[REGION] = "Region A"))
+
+
+A ocorrência de duplicatas de ID's  em bases de dados é um problema comum que pode afetar a integridade dos dados e a precisão das análises feitas a partir destes dados. As duplicatas podem surgir por vários motivos, como erros humanos, problemas no processo de geração de IDs únicos ou integração de dados de diferentes fontes. Isso pode levar a complicações na análise dos dados, como cálculos incorretos de indicadores de desempenho ou dificuldade em acompanhar o histórico de uma proposta em particular. 
+
+Abaixo, apresento uma solução em DAX para corrigi-las, caso ocorram.
+
+Na medida abaixo, desejamos calcular o valor total das propostas ganhas em uma determinada região, considerando apenas propostas com data de fechamento a partir de 2023:
+
+Note que os ID_PROPOSAL se repetem devido à duplicação de produtos inseridas em uma mesma proposta. 
+
+No caso, a base possui duplicatas de ID's conforme a tabela abaixo abaixo:
+
+| ID_PROPOSAL | REGION | STATUS        | CLOSING_DATE | TOTAL_VALUE |  PRODUCT  |
+|-------------|--------|---------------|--------------|-------------|-----------|
+| ID_1        | A      | Won proposal  | 2023-02-01   | 100         | Product A |
+| ID_1        | A      | Won proposal  | 2023-02-01   | 100         | Product B |
+| ID_2        | B      | Won proposal  | 2023-02-03   | 200         | Product A |
+| ID_3        | C      | Won proposal  | 2023-01-04   | 300         | Product C |
+| ID_3        | C      | Won proposal  | 2023-01-04   | 300         | Product C |
+
+Caso desejássemso calcular o valor total das propostas e usássemos apenas a função SUM, diretamente, sem a remoção das duplicatas
+
+
+PRODUCT
+ID_1	A	Won proposal	2023-02-01	100	Produto A
+ID_1	A	Won proposal	2023-02-01	100	Produto B
+ID_2	B	Won proposal	2023-02-03	200	Produto C
+ID_3	C	Won proposal	2023-01-04	300	Produto A
+ID_3	C	Won proposal	2023-01-04	300	Produto B
