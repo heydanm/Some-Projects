@@ -16,20 +16,13 @@ Note que os ID_PROPOSAL se repetem devido à duplicação de produtos inseridas 
 
 No caso, a base possui duplicatas de ID's conforme a tabela abaixo abaixo:
 
-| ID_PROPOSAL | REGION | STATUS        | CLOSING_DATE | TOTAL_VALUE |  PRODUCT  |
-|-------------|--------|---------------|--------------|-------------|-----------|
-| ID_1        | A      | Won proposal  | 2023-02-01   | 100         | Product A |
-| ID_1        | A      | Won proposal  | 2023-02-01   | 100         | Product B |
-| ID_2        | B      | Won proposal  | 2023-02-03   | 200         | Product A |
-| ID_3        | C      | Won proposal  | 2023-01-04   | 300         | Product C |
-| ID_3        | C      | Won proposal  | 2023-01-04   | 300         | Product C |
+| ID_PROPOSAL | REGION | STATUS        | CLOSING_DATE | PROPOSAL_TOTAL_VALUE |  PRODUCT  |
+|-------------|--------|---------------|--------------|----------------------|-----------|
+| ID_1        | A      | Won proposal  | 2023-02-01   | 100                  | Product A |
+| ID_1        | A      | Won proposal  | 2023-02-01   | 100                  | Product B |
+| ID_2        | B      | Won proposal  | 2023-02-03   | 200                  | Product A |
+| ID_3        | C      | Won proposal  | 2023-01-04   | 300                  | Product C |
+| ID_3        | C      | Won proposal  | 2023-01-04   | 300                  | Product C |
 
-Caso desejássemso calcular o valor total das propostas e usássemos apenas a função SUM, diretamente, sem a remoção das duplicatas
+Em caso de cálculo do valor total das propostas utilizando apenas a função SUM, diretamente, sem a remoção das duplicatas, ou apenas filtrando distintamente a coluna [ID_PROPOSAL], o retorno seria a somatória da coluna [TOTAL_VALUE].
 
-
-PRODUCT
-ID_1	A	Won proposal	2023-02-01	100	Produto A
-ID_1	A	Won proposal	2023-02-01	100	Produto B
-ID_2	B	Won proposal	2023-02-03	200	Produto C
-ID_3	C	Won proposal	2023-01-04	300	Produto A
-ID_3	C	Won proposal	2023-01-04	300	Produto B
