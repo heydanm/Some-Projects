@@ -1,11 +1,5 @@
 #How to Remove Duplicates when the key ID's
 
-CALCULATE(SUMX(DISTINCT('Table_1'[ID_PROPOSAL]), FIRSTNONBLANK('Table_1'[TOTAL_VALUE], 0)),
-FILTER('Table_1', 'Table_1'[STATUS] = "Won proposal"),
-FILTER('Table_1', 'Table_1'[CLOSING_DATE].[Year] >= 2023),
-FILTER('Table_1', 'Table_1'[REGION] = "Region A"))
-
-
 A ocorrência de duplicatas de ID's  em bases de dados é um problema comum que pode afetar a integridade dos dados e a precisão das análises feitas a partir destes dados. As duplicatas podem surgir por vários motivos, como erros humanos, problemas no processo de geração de IDs únicos ou integração de dados de diferentes fontes. Isso pode levar a complicações na análise dos dados, como cálculos incorretos de indicadores de desempenho ou dificuldade em acompanhar o histórico de uma proposta em particular. 
 
 Abaixo, apresento uma solução em DAX para corrigi-las, caso ocorram.
@@ -16,13 +10,66 @@ Note que os ID_PROPOSAL se repetem devido à duplicação de produtos inseridas 
 
 No caso, a base possui duplicatas de ID's conforme a tabela abaixo abaixo:
 
-| ID_PROPOSAL | REGION | STATUS        | CLOSING_DATE | PROPOSAL_TOTAL_VALUE |  PRODUCT  |
-|-------------|--------|---------------|--------------|----------------------|-----------|
-| ID_1        | A      | Won proposal  | 2023-02-01   | 100                  | Product A |
-| ID_1        | A      | Won proposal  | 2023-02-01   | 100                  | Product B |
-| ID_2        | B      | Won proposal  | 2023-02-03   | 200                  | Product A |
-| ID_3        | C      | Won proposal  | 2023-01-04   | 300                  | Product C |
-| ID_3        | C      | Won proposal  | 2023-01-04   | 300                  | Product C |
+| ID_PROPOSAL | REGION | STATUS                   | CLOSING_DATE | PROPOSAL_TOTAL_VALUE |  PRODUCT  |
+|-------------|--------|--------------------------|--------------|----------------------|-----------|
+| ID_1        | A      | Won proposal             | 2023-02-01   | 100                  | Product A |
+| ID_1        | A      | Won proposal             | 2023-02-01   | 100                  | Product B |
+| ID_2        | B      | Won proposal             | 2023-02-03   | 200                  | Product A |
+| ID_3        | C      | Won proposal             | 2023-01-04   | 300                  | Product C |
+| ID_3        | C      | Won proposal             | 2023-01-04   | 300                  | Product C |
+| ID_4        | A      | Unsuccessful proposal    | 2023-02-01   | 100                  | Product A |
+| ID_5        | A      | Unsuccessful proposal    | 2023-02-01   | 100                  | Product B |
+| ID_6        | B      | Won proposal             | 2022-02-03   | 200                  | Product A |
+| ID_7        | C      | Won proposal             | 2022-01-04   | 300                  | Product C |
+| ID_8        | C      | Unsuccessful proposal    | 2022-01-04   | 300                  | Product C |
 
-Em caso de cálculo do valor total das propostas utilizando apenas a função SUM, diretamente, sem a remoção das duplicatas, ou apenas filtrando distintamente a coluna [ID_PROPOSAL], o retorno seria a somatória da coluna [TOTAL_VALUE].
+Em caso de cálculo do valor total das propostas utilizando apenas a função SUM, diretamente, sem a remoção das duplicatas, ou apenas filtrando distintamente a coluna [ID_PROPOSAL], o retorno seria a somatória da coluna [PROPOSAL_TOTAL_VALUE], o que geraria um cálculo equivocado. 
+
+Digamos que quiséssemos somar [PROPOSAL_TOTAL_VALUE] das propostas ganhas de forma distinta, sem a duplicidade por Produtos duplicados para o ano de 2023. A medida dax correta seria: 
+
+MESUERE_WITH_DISTINCT_VALUES_FROM_DISTINCT_WON_PROPOSAL = 
+CALCULATE(
+SUMX(
+DISTINCT('Table_1'[ID_PROPOSAL]),
+FIRSTNONBLANK('Table_1'[TOTAL_VALUE], 0)
+),
+FILTER('Table_1', 'Table_1'[STATUS] = "Won proposal"),
+FILTER('Table_1', 'Table_1'[CLOSING_DATE].[Year] >= 2023),
+)
+
+
+As variáveis envolvidas são:
+
+'Table_1': nome da tabela que contém os dados a serem analisados.
+
+'ID_PROPOSAL': nome da coluna que contém o identificador único de cada proposta.
+
+'TOTAL_VALUE': nome da coluna que contém o valor total de cada proposta.
+
+'Status': nome da coluna que indica o status de cada proposta (ganha, perdida, em andamento etc.).
+
+'CLOSING_DATE': nome da coluna que indica a data de fechamento de cada proposta.
+
+'Year': função que extrai o ano da data de fechamento da proposta.
+
+
+Os objetivos da medida são:
+
+Somar o valor total de todas as propostas ganhas em uma determinada região.
+
+Considerar apenas as propostas com data de fechamento a partir de 2023.
+
+Remover duplicatas na contagem do valor total, considerando apenas o primeiro valor não nulo encontrado.
+
+Aplicar filtros para restringir a análise às propostas ganhas na região A.
+
+A medida está sendo usada para calcular a soma dos valores totais de todas as propostas ganhas ('Won proposal') em uma determinada região e produto, considerando apenas as propostas que foram fechadas após o ano de 2023.
+
+A função CALCULATE é usada para modificar o contexto de filtro da tabela 'Table_1' e filtrar os dados com base nas condições especificadas posteriormente na medida.
+
+A função SUMX é usada para somar o resultado de uma expressão para cada linha de uma tabela. Nesse caso, a expressão está sendo aplicada a cada ID_PROPOSAL distinto na tabela, que está sendo obtido com a função DISTINCT.
+
+A função FIRSTNONBLANK está sendo usada para obter o primeiro valor não vazio de 'Table_1'[TOTAL_VALUE]. Se o primeiro valor encontrado for vazio, o valor 0 será retornado. Em outras palavras, essa função está sendo usada para substituir os valores nulos na coluna TOTAL_VALUE com zero.
+
+Então, a medida está somando todos os valores totais (incluindo aqueles que foram substituídos por zero) de cada ID_PROPOSAL distinto na tabela.
 
