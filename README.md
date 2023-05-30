@@ -66,5 +66,6 @@ The objectives of the measure are as follows:
 
 ##### The 'FIRSTNONBLANK' function is being used to get the first non-empty value from 'Table_1'[TOTAL_VALUE]. If the first value encountered is empty, the value 0 is returned. In other words, this function is used to replace null values in the TOTAL_VALUE column with zero.
 
- Therefore, the measure is summing all total values (including those replaced with zero) for each distinct ID_PROPOSAL in the table.
+The measure "DISTINCT_VALUES_FROM_DISTINCT_WON_PROPOSAL" is a powerful and efficient solution for calculating the total value of won proposals, considering specific criteria and handling duplicates appropriately. By implementing this measure in Power BI, precise and reliable results can be obtained when summing the total values of won proposals in a specific region and product, taking into account the defined restrictions.
 
+Through the use of the 'CALCULATE', 'SUMX', and 'FIRSTNONBLANK' functions, the filter context can be modified, the values can be summed for each distinct ID_PROPOSAL, and null values can be replaced with zero, ensuring the integrity of the calculations. With this measure, data analysts can gain a more comprehensive and accurate view of the won proposals, enabling more informed and effective decision-making.
